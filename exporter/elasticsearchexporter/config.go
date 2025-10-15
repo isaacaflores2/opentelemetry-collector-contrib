@@ -383,6 +383,7 @@ func (cfg *Config) Validate() error {
 		// convert metadata keys to lower case as these are case insensitive
 		cfg.MetadataKeys[i] = kl
 	}
+	fmt.Printf("> Loaded metadata keys: %v\n", cfg.MetadataKeys)
 
 	return nil
 }

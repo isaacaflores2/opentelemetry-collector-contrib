@@ -6,6 +6,7 @@ package elasticsearchexporter // import "github.com/open-telemetry/opentelemetry
 import (
 	"bytes"
 	"context"
+	"fmt"
 
 	"go.opentelemetry.io/collector/client"
 	"go.opentelemetry.io/collector/exporter/exporterhelper/xexporterhelper"
@@ -36,5 +37,6 @@ func (p metadataKeysPartitioner) GetKey(
 			}
 		}
 	}
+	fmt.Println("> Partition key:", kb.String())
 	return kb.String()
 }

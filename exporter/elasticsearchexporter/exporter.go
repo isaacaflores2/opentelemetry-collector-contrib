@@ -8,6 +8,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/elastic/go-docappender/v2"
 	"go.opentelemetry.io/collector/client"
@@ -97,6 +98,15 @@ func (e *elasticsearchExporter) Shutdown(ctx context.Context) error {
 }
 
 func (e *elasticsearchExporter) pushLogsData(ctx context.Context, ld plog.Logs) error {
+	sb := &strings.Builder{}
+	for _, il := range ld.ResourceLogs().All() {
+		serviceName, _ := il.Resource().Attributes().Get("service.name")
+		sb.WriteString(fmt.Sprintf("service.name=%q, ", serviceName.AsString()))
+
+	}
+
+	fmt.Printf("> Received log data with %d resources and %d logs. Service names: %s \n", ld.ResourceLogs().All(), ld.LogRecordCount(), sb.String())
+
 	defaultMappingMode, err := e.getRequestMappingMode(ctx)
 	if err != nil {
 		return err
@@ -188,6 +198,15 @@ func (p *dataPointsGroup) addDataPoint(dp datapoints.DataPoint) {
 }
 
 func (e *elasticsearchExporter) pushMetricsData(ctx context.Context, metrics pmetric.Metrics) error {
+	sb := &strings.Builder{}
+	for _, il := range metrics.ResourceMetrics().All() {
+		serviceName, _ := il.Resource().Attributes().Get("service.name")
+		sb.WriteString(fmt.Sprintf("service.name=%q, ", serviceName.AsString()))
+
+	}
+
+	fmt.Printf("> Received metric data with %d resources and %d metrics. Service names: %s \n", metrics.ResourceMetrics().All(), metrics.MetricCount(), sb.String())
+
 	defaultMappingMode, err := e.getRequestMappingMode(ctx)
 	if err != nil {
 		return err
@@ -353,6 +372,15 @@ func (e *elasticsearchExporter) pushTraceData(
 	ctx context.Context,
 	td ptrace.Traces,
 ) error {
+	sb := &strings.Builder{}
+	for _, il := range td.ResourceSpans().All() {
+		serviceName, _ := il.Resource().Attributes().Get("service.name")
+		sb.WriteString(fmt.Sprintf("service.name=%q, ", serviceName.AsString()))
+
+	}
+
+	fmt.Printf("> Received trace data with %d resources and %d spans. Service names: %s \n", td.ResourceSpans().Len(), td.SpanCount(), sb.String())
+
 	// Get the partioner key from the context
 	// Decode the key to get the info
 	defaultMappingMode, err := e.getRequestMappingMode(ctx)
@@ -625,6 +653,16 @@ func (sessions *sessionList) End() {
 
 func (e *elasticsearchExporter) getRequestMappingMode(ctx context.Context) (MappingMode, error) {
 	const metadataKey = "x-elastic-mapping-mode"
+	// print all metadata keys for debugging
+	totalKeys := 0
+	sb := &strings.Builder{}
+	sb.WriteString("> client metadata: ")
+	for key := range client.FromContext(ctx).Metadata.Keys() {
+		sb.WriteString(fmt.Sprintf("key=%q, values=%q; ", key, client.FromContext(ctx).Metadata.Get(key)))
+		totalKeys++
+	}
+	sb.WriteString(fmt.Sprintf(". Total keys: %d keys", totalKeys))
+	fmt.Println(sb.String())
 
 	values := client.FromContext(ctx).Metadata.Get(metadataKey)
 	switch n := len(values); n {
