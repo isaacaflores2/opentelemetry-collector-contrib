@@ -426,9 +426,12 @@ When "Preserved" is true, the attribute will be preserved in the payload and dup
 
 | Semantic Convention Name | ECS Name                    | Preserve |
 |--------------------------|-----------------------------|----------|
+| client.address           | client.ip                   | false    |
 | cloud.platform           | cloud.service.name          | false    |
 | container.image.tags     | container.image.tag         | false    |
 | deployment.environment   | service.environment         | false    |
+| faas.instance            | faas.id                     | false    |
+| faas.trigger             | faas.trigger.type           | false    |
 | host.arch                | host.architecture           | false    |
 | host.name                | host.hostname               | true     |
 | k8s.cluster.name         | orchestrator.cluster.name   | false    |
@@ -447,10 +450,14 @@ When "Preserved" is true, the attribute will be preserved in the payload and dup
 | os.name                  | host.os.name                | false    |
 | os.type                  | host.os.platform            | false    |
 | os.version               | host.os.version             | false    |
+| process.command_line     | process.args                 | false    |
+| process.executable.name  | process.title                | false    |
 | process.executable.path  | process.executable          | false    |
+| process.parent.pid       | process.parent.pid          | false    |
 | process.runtime.name     | service.runtime.name        | false    |
 | process.runtime.version  | service.runtime.version     | false    |
 | service.instance.id      | service.node.name           | false    |
+| source.address           | source.ip                   | false    |
 | telemetry.distro.name    | ""                          | false    |
 | telemetry.distro.version | ""                          | false    |
 | telemetry.sdk.language   | ""                          | false    |
